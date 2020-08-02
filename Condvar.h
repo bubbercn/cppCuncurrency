@@ -7,7 +7,7 @@ mutex aMutex;
 bool isDataReady = false;
 condition_variable condVar;
 
-void PrintString(const char* s)
+void PrintString(const char *s)
 {
     unique_lock<mutex> lock(aMutex);
     cout << s << endl;
@@ -18,11 +18,12 @@ void ProcessData()
     PrintString("Waiting for data...");
     {
         unique_lock<mutex> lock(aMutex);
-        while (![] { return isDataReady; }()) 
-        {
-            // <-- time window -->
-            condVar.wait(lock);
-        }
+        condVar.wait(lock, [] { return isDataReady; });
+        // while (![] { return isDataReady; })
+        // {
+        //     // <-- time window -->
+        //     condVar.wait(lock);
+        // }
     }
     PrintString("Got data. Processing data...");
 }
